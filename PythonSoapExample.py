@@ -1,3 +1,7 @@
+#This example shows how to create a SOAP client using Panopto's wsdl files and the pysimplesoap library in Python. 
+#It also shows how to construct an object to use as an argument in these calls, and provides examples of calling 
+#both the CreateUser and AddMembersToInternalGroup methods from the API.
+
 import hashlib
 import uuid
 #This demonstration uses the pysimplesoap (soap2py) library.
