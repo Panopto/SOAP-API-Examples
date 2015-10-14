@@ -1,8 +1,12 @@
+#This example shows how to create a SOAP client using Panopto's wsdl files and the Savon library in Ruby.
+#It also provides an example of how to use this client to make calls to the Panopto API, in this case to the
+#ListGroups function.
+
 require 'digest/sha1'
 require 'uuid'
+#This example uses version 2 of the 'Savon' SOAP client library ruby,
+#which can be found at http://savonrb.com/version2/
 require 'savon'
-
-
 
 #    function used to create auth code for SOAP requests
 #    'userkey' is either user's Panopto admin's username, or the username decorated with the the external provider's
