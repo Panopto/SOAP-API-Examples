@@ -149,6 +149,9 @@ class PanoptoSessionManagementSoapClient extends SoapClient{
 
     //Create a SOAP client for the desired Panopto API class, in this cas SessionManagement
     $sessionManagementClient = new PanoptoSessionManagementSoapClient($ServerName, $UserKey, $AuthCode, $Password);
+    
+    //Set https endpoint in case wsdl specifies http 
+    $sessionManagementClient ->__setLocation("https://". $ServerName . "/Panopto/PublicAPI/4.6/SessionManagement.svc");
 
     
     $requestPagination = Create_Pagination_Object(100, 0);
