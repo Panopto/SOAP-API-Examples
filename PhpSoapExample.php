@@ -170,7 +170,7 @@ class PanoptoSessionManagementSoapClient extends SoapClient{
     $requestPagination = Create_Pagination_Object(100, 0);
 
     //Create a list session request object. Sample values shown here.
-    /*$listSessionsRequest = Create_ListSessionsRequest_Object(
+    $listSessionsRequest = Create_ListSessionsRequest_Object(
         "2017-05-27T12:12:22",
         "d68ecc7b-08f9-4f4a-b087-f7022b66c378", 
         null, 
@@ -182,9 +182,9 @@ class PanoptoSessionManagementSoapClient extends SoapClient{
     $response = $sessionManagementClient->get_session_list($listSessionsRequest, "");
    
     //Display response. It will be a json encoded object of type GetSessionsListResult. See API documentation for members.
-    var_dump($response);*/
+    var_dump($response);
     
-    $listSessionsByIdRequest= Create_ListSessionsByIdRequest_Object(array("39d24f36-7724-480f-a72f-e712943c1309", "49d7df39-22d0-4a07-b17d-bc9509562e3d"));
+    $listSessionsByIdRequest= Create_ListSessionsByIdRequest_Object(array("085bd329-db16-4084-b911-5a99e0bd53ad", "ae0d10a5-c242-41fd-a5a9-7ab0aaa0da9e"));
     
     $response = $sessionManagementClient->get_sessions_by_id($listSessionsByIdRequest);
     
@@ -251,7 +251,7 @@ class PanoptoSessionManagementSoapClient extends SoapClient{
      	$listSessionsRequest = new stdClass();
      	$sessionIds = new ArrayObject();
      	foreach($sessionIdArray as $guid) {
-     		$sessionIds->append(new SoapVar($guid, XSD_STRING, 'Guid', null, null, null));
+     		$sessionIds->append(new SoapVar($guid, XSD_STRING, null, null, null, PanoptoSessionManagementSoapClient::OBJECT_MEMBER_NAMESPACE));
      	}
      	
      	$listSessionsRequest->sessionIds = new SoapVar($sessionIds, SOAP_ENC_ARRAY, null, null, null, PanoptoSessionManagementSoapClient::ROOT_LEVEL_NAMESPACE);
