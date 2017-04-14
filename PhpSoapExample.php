@@ -1,5 +1,10 @@
 <?php
 
+require_once("./wsdl_classes/SessionManagementWsdlClass.php");
+require_once("./wsdl_classes/Authentication/Info/SessionManagementStructAuthenticationInfo.php");
+require_once("./wsdl_classes/Get/Id/SessionManagementStructGetFoldersById.php");
+require_once("./wsdl_classes/Array/Ofguid/SessionManagementStructArrayOfguid.php");
+
 class PanoptoSessionManagementSoapClient extends SoapClient{
 
         //Namespace used for XML nodes for any root level variables or objects 
@@ -129,9 +134,18 @@ class PanoptoSessionManagementSoapClient extends SoapClient{
      * $request is a soap encoded ListSessionsRequest object
      * $searchQuery is an optional string containing an custom sql query
      */
-    public function get_sessions_by_id($requestvar)
-    {
-    	return self::call_web_method("GetSessionsById", $requestvar);
+    public function get_folders_by_id($requestvar) {
+    	$methodname = "GetFoldersById";
+    	//Create a soap param using the obj container
+    	$param = new SoapParam($requestvar, 'data');
+    	
+    	//Add the created soap param to an array to be passed to __soapCall
+    	$params = array($param);
+    	
+    	//Update current action with the method being called.
+    	$this->currentaction = "http://tempuri.org/ISessionManagement/$methodname";
+    	
+    	return parent::__soapCall($methodname, $params);
     }
     
       /**
@@ -145,13 +159,13 @@ class PanoptoSessionManagementSoapClient extends SoapClient{
 }
 
     //The username of the calling panopto user.
-    $UserKey = "blackboardEC2\administrator";
+    $UserKey = "instanceName\userName";
 
     //The name of the panopto server to make API calls to (i.e. demo.hosted.panopto.com)
-    $ServerName = "automation.hosted.panopto.com";
+    $ServerName = "put.panopto.server.here";
 
     //The application key from provider on the Panopto provider's page. Should be a string representation of a guid.
-    $ApplicationKey = "9441be43-e88e-469b-b3a1-aea5e2b1d0a0";
+    $ApplicationKey = "00000000-0000-0000-0000-000000000000";
 
     //Password of the calling user on Panopto server. Only required if external provider does not have a bounce page.
     $Password = null;
@@ -172,7 +186,7 @@ class PanoptoSessionManagementSoapClient extends SoapClient{
     //Create a list session request object. Sample values shown here.
     $listSessionsRequest = Create_ListSessionsRequest_Object(
         "2017-05-27T12:12:22",
-        "d68ecc7b-08f9-4f4a-b087-f7022b66c378", 
+        "00000000-0000-0000-0000-000000000000", 
         null, 
         "Name", 
         true, 
@@ -183,10 +197,25 @@ class PanoptoSessionManagementSoapClient extends SoapClient{
    
     //Display response. It will be a json encoded object of type GetSessionsListResult. See API documentation for members.
     var_dump($response);
+        
+    $authparam = new SessionManagementStructAuthenticationInfo(
+        $AuthCode,
+        NULL,
+        $UserKey
+    );
     
-    $listSessionsByIdRequest= Create_ListSessionsByIdRequest_Object(array("085bd329-db16-4084-b911-5a99e0bd53ad", "ae0d10a5-c242-41fd-a5a9-7ab0aaa0da9e"));
+    // Add any folder Id's you wish to query against here.
+    $folderIds = array(
+    	"00000000-0000-0000-0000-000000000000",
+    	"00000000-0000-0000-0000-000000000000"
+    );
     
-    $response = $sessionManagementClient->get_sessions_by_id($listSessionsByIdRequest);
+    // This will convert your array of folder Id's into a structure that our API can handle.
+    $folderidlist = new SessionManagementStructArrayOfguid($folderIds);
+    $getFoldersByIdRequest = new SessionManagementStructGetFoldersById($authparam, $folderidlist);
+    
+    //Call api and get response
+    $response = $sessionManagementClient->get_folders_by_id($getFoldersByIdRequest);
     
     //Display response. It will be a json encoded object of type GetSessionsByIdResult. See API documentation for members.
     var_dump($response);
@@ -235,27 +264,6 @@ class PanoptoSessionManagementSoapClient extends SoapClient{
      	$listSessionsRequest->SortBy = new SoapVar($sortBy, XSD_STRING, null, null, null, PanoptoSessionManagementSoapClient::OBJECT_MEMBER_NAMESPACE);
      	$listSessionsRequest->SortIncreasing = new SoapVar($sortIncreasing, XSD_BOOLEAN, null, null, null, PanoptoSessionManagementSoapClient::OBJECT_MEMBER_NAMESPACE);
      	$listSessionsRequest->StartDate = new SoapVar($startDate, XSD_STRING, null, null, null, PanoptoSessionManagementSoapClient::OBJECT_MEMBER_NAMESPACE);
-     	return $listSessionsRequest;
-     }
-     
-     //Example of creating object for use in a SOAP request.
-     //This will create a ListSessionsRequest object for use as a parameter in the
-     //ISessionManagement.GetSessionsList method.
-     //Refer to the API documentation on the requirements and datatypes of members.
-     //Members must be created within the containing object in the same order they appear in the documentation.
-     //All names are case sensitive.
-     function Create_ListSessionsByIdRequest_Object($sessionIdArray)
-     {
-     	
-     	//Create empty object to store member data
-     	$listSessionsRequest = new stdClass();
-     	$sessionIds = new ArrayObject();
-     	foreach($sessionIdArray as $guid) {
-     		$sessionIds->append(new SoapVar($guid, XSD_STRING, null, null, null, PanoptoSessionManagementSoapClient::OBJECT_MEMBER_NAMESPACE));
-     	}
-     	
-     	$listSessionsRequest->sessionIds = new SoapVar($sessionIds, SOAP_ENC_ARRAY, null, null, null, PanoptoSessionManagementSoapClient::ROOT_LEVEL_NAMESPACE);
-     	
      	return $listSessionsRequest;
      }
 ?>
